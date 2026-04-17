@@ -1,7 +1,8 @@
 # Personalized Video Campaign Manager
 
 ## Overview
-This project is a Laravel-based API system for managing personalized video campaigns.  
+
+This project is a Laravel-based API system for managing personalized video campaigns.
 It allows clients to create campaigns and upload user-specific video data efficiently using asynchronous background processing.
 
 The system is designed to be scalable, API-driven, and optimized for handling large datasets.
@@ -10,38 +11,44 @@ The system is designed to be scalable, API-driven, and optimized for handling la
 
 ## Tech Stack
 
-- PHP 8.x
-- Laravel 12+
-- MySQL
-- Docker & Docker Compose
-- Laravel Queues
+* PHP 8.x
+* Laravel 12+
+* MySQL
+* Docker & Docker Compose
+* Laravel Queues
 
 ---
 
 ## Features
 
 ### Campaign Management
-- Create campaigns linked to clients
-- Store campaign start and end dates
+
+* Create campaigns linked to clients
+* Store campaign start and end dates
 
 ### Campaign Data Processing
-- Bulk upload of campaign data via API
-- Supports dynamic `custom_fields` using JSON storage
+
+* Bulk upload of campaign data via API
+* Supports dynamic `custom_fields` using JSON storage
 
 ### Asynchronous Processing
-- Campaign data ingestion is handled via background jobs
-- API responds immediately with HTTP 202 (Accepted)
+
+* Campaign data ingestion is handled via background jobs
+* API responds immediately with HTTP 202 (Accepted)
 
 ### Duplicate Handling Strategy
+
 If a `user_id` already exists within a campaign:
-- The existing record is updated
-- Custom fields are merged
-- A log entry is created in `campaign_data_duplicate_logs`
+
+* The existing record is updated
+* Custom fields are merged
+* A log entry is created in `campaign_data_duplicate_logs`
 
 Each duplicate attempt stores:
-- Previous values
-- Updated values
-- Action taken
+
+* Previous values
+* Updated values
+* Action taken
 
 ---
 
@@ -51,48 +58,76 @@ Each duplicate attempt stores:
 
 ```bash
 php artisan analytics:campaign {campaignId}
+```
 
-Installation & Setup
-Clone the repository
+---
 
+## Installation & Setup
+
+### Clone the repository
+
+```bash
 git clone https://github.com/NancyRoseV/personalized-video-campaign-manager.git
 cd personalized-video-campaign-manager
+```
 
-Start the application using Docker
+### Start the application using Docker
+
+```bash
 docker compose up -d --build
+```
 
-Run database migrations
+### Run database migrations
+
+```bash
 docker compose exec app bash
 php artisan migrate
+```
 
-Start the queue worker (required for background processing)
+### Start the queue worker (required for background processing)
+
+```bash
 docker compose exec app bash
 php artisan queue:work
+```
 
-API Endpoints
-Create a Campaign
+---
 
-POST /api/campaigns
+## API Endpoints
 
-Request Body
+### Create a Campaign
+
+**POST /api/campaigns**
+
+#### Request Body
+
+```json
 {
   "client_id": 1,
   "name": "Spring Launch",
   "start_date": "2026-04-16",
   "end_date": "2026-05-16"
 }
+```
 
-Response
+#### Response
+
+```json
 {
   "message": "Campaign created successfully.",
   "data": { ... }
 }
+```
 
-Add Campaign Data
+---
 
-POST /api/campaigns/{campaign_id}/data
+### Add Campaign Data
 
-Request Body
+**POST /api/campaigns/{campaign_id}/data**
+
+#### Request Body
+
+```json
 [
   {
     "user_id": "user_1",
@@ -103,13 +138,22 @@ Request Body
     }
   }
 ]
+```
 
-Response
+#### Response
+
+```json
 {
   "message": "Campaign data accepted for processing."
 }
+```
 
-Background Job Processing
+---
+
+## Background Job Processing
 
 Campaign data is processed asynchronously using:
+
+```php
 App\Jobs\ProcessCampaignData
+```
