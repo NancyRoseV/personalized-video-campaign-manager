@@ -1,9 +1,10 @@
 # Personalized Video Campaign Manager
 
 ## Overview
-This project is a Laravel-based API system for managing personalized video campaigns. It allows clients to create campaigns and asynchronously upload user-specific video data.
+This project is a Laravel-based API system for managing personalized video campaigns.  
+It allows clients to create campaigns and upload user-specific video data efficiently using asynchronous background processing.
 
-The system is designed to be scalable, efficient, and API-driven, with background processing handled via Laravel Queues.
+The system is designed to be scalable, API-driven, and optimized for handling large datasets.
 
 ---
 
@@ -26,11 +27,10 @@ The system is designed to be scalable, efficient, and API-driven, with backgroun
 ### Campaign Data Processing
 - Bulk upload of campaign data via API
 - Supports dynamic `custom_fields` using JSON storage
-- Handles large datasets efficiently
 
 ### Asynchronous Processing
 - Campaign data ingestion is handled via background jobs
-- API returns immediately with HTTP 202
+- API responds immediately with HTTP 202 (Accepted)
 
 ### Duplicate Handling Strategy
 If a `user_id` already exists within a campaign:
@@ -43,8 +43,73 @@ Each duplicate attempt stores:
 - Updated values
 - Action taken
 
-### Analytics Command
-Provides campaign insights via CLI:
+---
+
+## Analytics Command
+
+### Run the analytics report for a campaign
 
 ```bash
 php artisan analytics:campaign {campaignId}
+
+Installation & Setup
+Clone the repository
+
+git clone https://github.com/NancyRoseV/personalized-video-campaign-manager.git
+cd personalized-video-campaign-manager
+
+Start the application using Docker
+docker compose up -d --build
+
+Run database migrations
+docker compose exec app bash
+php artisan migrate
+
+Start the queue worker (required for background processing)
+docker compose exec app bash
+php artisan queue:work
+
+API Endpoints
+Create a Campaign
+
+POST /api/campaigns
+
+Request Body
+{
+  "client_id": 1,
+  "name": "Spring Launch",
+  "start_date": "2026-04-16",
+  "end_date": "2026-05-16"
+}
+
+Response
+{
+  "message": "Campaign created successfully.",
+  "data": { ... }
+}
+
+Add Campaign Data
+
+POST /api/campaigns/{campaign_id}/data
+
+Request Body
+[
+  {
+    "user_id": "user_1",
+    "video_url": "https://example.com/video-1.mp4",
+    "custom_fields": {
+      "first_name": "Nancy",
+      "plan": "Premium"
+    }
+  }
+]
+
+Response
+{
+  "message": "Campaign data accepted for processing."
+}
+
+Background Job Processing
+
+Campaign data is processed asynchronously using:
+App\Jobs\ProcessCampaignData
