@@ -9,6 +9,14 @@ The system is designed to be scalable, API-driven, and optimized for handling la
 
 ---
 
+## Key Design Decisions
+
+- Asynchronous processing used for scalability
+- Duplicate records handled via update + logging strategy
+- Custom fields stored as JSON for flexibility
+
+---
+
 ## Tech Stack
 
 * PHP 8.x
@@ -150,10 +158,8 @@ php artisan queue:work
 
 ---
 
-## Background Job Processing
+## Campaign data is processed asynchronously using:
 
-Campaign data is processed asynchronously using:
-
-```php
 App\Jobs\ProcessCampaignData
-```
+
+This ensures fast API responses while heavy processing is handled in the background.
